@@ -1,7 +1,10 @@
-import { StyleSheet, Text, View, TouchableOpacity } from 'react-native';
+import { StyleSheet, Text, View } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../navigation/AppNavigator';
+import Button from '../components/Button';
+import Card from '../components/Card';
+import { colors, typography, spacing } from '../utils/theme';
 
 type NavigationProp = NativeStackNavigationProp<RootStackParamList>;
 
@@ -13,12 +16,18 @@ export default function HomeScreen() {
       <Text style={styles.title}>Home Screen</Text>
       <Text style={styles.subtitle}>Welcome to Pick Just One!</Text>
       
-      <TouchableOpacity 
-        style={styles.button}
-        onPress={() => navigation.navigate('About')}
-      >
-        <Text style={styles.buttonText}>Go to About</Text>
-      </TouchableOpacity>
+      <Card variant="elevated" style={styles.card}>
+        <Text style={styles.cardTitle}>Get Started</Text>
+        <Text style={styles.cardDescription}>
+          Start making conscious decisions today.
+        </Text>
+        <Button
+          title="Go to About"
+          onPress={() => navigation.navigate('About')}
+          variant="primary"
+          size="medium"
+        />
+      </Card>
     </View>
   );
 }
@@ -26,30 +35,33 @@ export default function HomeScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: colors.backgroundSecondary,
     alignItems: 'center',
     justifyContent: 'center',
+    padding: spacing.md,
   },
   title: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    marginBottom: 8,
+    ...typography.h1,
+    color: colors.text,
+    marginBottom: spacing.sm,
   },
   subtitle: {
-    fontSize: 16,
-    color: '#666',
-    marginBottom: 32,
+    ...typography.body,
+    color: colors.textSecondary,
+    marginBottom: spacing.xl,
   },
-  button: {
-    backgroundColor: '#007AFF',
-    paddingHorizontal: 24,
-    paddingVertical: 12,
-    borderRadius: 8,
-    marginTop: 16,
+  card: {
+    width: '100%',
+    maxWidth: 400,
   },
-  buttonText: {
-    color: '#fff',
-    fontSize: 16,
-    fontWeight: '600',
+  cardTitle: {
+    ...typography.h3,
+    color: colors.text,
+    marginBottom: spacing.sm,
+  },
+  cardDescription: {
+    ...typography.body,
+    color: colors.textSecondary,
+    marginBottom: spacing.md,
   },
 });

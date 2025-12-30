@@ -1,5 +1,8 @@
-import { StyleSheet, Text, View, TouchableOpacity } from 'react-native';
+import { StyleSheet, Text, View } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
+import Button from '../components/Button';
+import Card from '../components/Card';
+import { colors, typography, spacing } from '../utils/theme';
 
 export default function AboutScreen() {
   const navigation = useNavigation();
@@ -7,16 +10,22 @@ export default function AboutScreen() {
   return (
     <View style={styles.container}>
       <Text style={styles.title}>About</Text>
-      <Text style={styles.description}>
-        Pick Just One helps you make conscious decisions.
-      </Text>
       
-      <TouchableOpacity 
-        style={styles.button}
+      <Card variant="default" style={styles.card}>
+        <Text style={styles.description}>
+          Pick Just One helps you make conscious decisions by focusing on one choice at a time.
+        </Text>
+        <Text style={styles.description}>
+          Instead of long to-do lists, we help you pick just one priority right now.
+        </Text>
+      </Card>
+      
+      <Button
+        title="Go Back"
         onPress={() => navigation.goBack()}
-      >
-        <Text style={styles.buttonText}>Go Back</Text>
-      </TouchableOpacity>
+        variant="outline"
+        size="medium"
+      />
     </View>
   );
 }
@@ -24,32 +33,25 @@ export default function AboutScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: colors.backgroundSecondary,
     alignItems: 'center',
     justifyContent: 'center',
-    padding: 20,
+    padding: spacing.md,
   },
   title: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    marginBottom: 16,
+    ...typography.h1,
+    color: colors.text,
+    marginBottom: spacing.lg,
+  },
+  card: {
+    width: '100%',
+    maxWidth: 400,
+    marginBottom: spacing.lg,
   },
   description: {
-    fontSize: 16,
-    color: '#666',
-    textAlign: 'center',
-    marginBottom: 32,
-  },
-  button: {
-    backgroundColor: '#007AFF',
-    paddingHorizontal: 24,
-    paddingVertical: 12,
-    borderRadius: 8,
-    marginTop: 16,
-  },
-  buttonText: {
-    color: '#fff',
-    fontSize: 16,
-    fontWeight: '600',
+    ...typography.body,
+    color: colors.textSecondary,
+    textAlign: 'left',
+    marginBottom: spacing.md,
   },
 });
