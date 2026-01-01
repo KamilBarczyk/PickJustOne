@@ -22,11 +22,19 @@ export default function HomeScreen() {
           Start making conscious decisions today.
         </Text>
         <Button
-          title="Go to About"
-          onPress={() => navigation.navigate('About')}
+          title="Add Tasks"
+          onPress={() => navigation.navigate('Tasks')}
           variant="primary"
           size="medium"
         />
+        <View style={styles.secondButton}>
+          <Button
+            title="Go to About"
+            onPress={() => navigation.navigate('About')}
+            variant="outline"
+            size="medium"
+          />
+        </View>
       </Card>
     </View>
   );
@@ -63,5 +71,8 @@ const styles = StyleSheet.create({
     ...typography.body,
     color: colors.textSecondary,
     marginBottom: spacing.md,
+  },
+  secondButton: {
+    marginTop: spacing.sm,
   },
 });
