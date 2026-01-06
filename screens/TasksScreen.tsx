@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, StyleSheet, ScrollView, Pressable } from 'react-native';
+import { View, Text, TextInput, StyleSheet, ScrollView, Pressable, KeyboardAvoidingView, Platform } from 'react-native';
 import { colors, typography, spacing, borderRadius } from '../utils/theme';
 import Button from '../components/Button';
 import Card from '../components/Card';
@@ -56,7 +56,16 @@ export default function TasksScreen() {
   const hasRest = tasks.some(task => task.isRest);
 
   return (
-    <ScrollView style={styles.container} contentContainerStyle={styles.content}>
+    <KeyboardAvoidingView 
+      style={styles.container}
+      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+      keyboardVerticalOffset={Platform.OS === 'ios' ? 100 : 20}
+    >
+      <ScrollView 
+        style={styles.container} 
+        contentContainerStyle={styles.content}
+        keyboardShouldPersistTaps="handled"
+      >
       <View style={styles.header}>
         <Text style={styles.title}>What's on your mind?</Text>
         <Text style={styles.subtitle}>
@@ -139,7 +148,8 @@ export default function TasksScreen() {
           </Text>
         )}
       </View>
-    </ScrollView>
+      </ScrollView>
+    </KeyboardAvoidingView>
   );
 }
 
@@ -150,6 +160,7 @@ const styles = StyleSheet.create({
   },
   content: {
     padding: spacing.md,
+    paddingBottom: spacing.xxl, // Extra padding for keyboard
   },
   header: {
     alignItems: 'center',
@@ -185,9 +196,14 @@ const styles = StyleSheet.create({
   },
   input: {
     flex: 1,
-    ...typography.body,
+    fontSize: typography.body.fontSize,
+    fontWeight: typography.body.fontWeight,
+    lineHeight: typography.body.lineHeight, // Use original line height
     color: colors.text,
     paddingVertical: spacing.sm,
+    paddingHorizontal: spacing.xs,
+    minHeight: 44, // Standard touch target
+    includeFontPadding: false, // Remove extra font padding on Android
   },
   removeButton: {
     padding: spacing.xs,
