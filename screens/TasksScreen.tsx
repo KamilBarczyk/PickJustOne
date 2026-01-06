@@ -7,6 +7,7 @@ import Card from '../components/Card';
 interface Task {
   id: string;
   text: string;
+  isRest?: boolean; // Special task for "Rest" option
 }
 
 export default function TasksScreen() {
@@ -25,6 +26,14 @@ export default function TasksScreen() {
     }
   };
 
+  // Add "Rest" option (special task)
+  const addRestOption = () => {
+    const hasRest = tasks.some(task => task.isRest);
+    if (!hasRest && tasks.length < MAX_TASKS) {
+      setTasks([...tasks, { id: 'rest', text: 'Rest', isRest: true }]);
+    }
+  };
+
   // Remove task
   const removeTask = (id: string) => {
     if (tasks.length > MIN_TASKS) {
@@ -32,16 +41,19 @@ export default function TasksScreen() {
     }
   };
 
-  // Update task text
+  // Update task text (but not for Rest option)
   const updateTask = (id: string, text: string) => {
     setTasks(tasks.map(task => 
-      task.id === id ? { ...task, text } : task
+      task.id === id && !task.isRest ? { ...task, text } : task
     ));
   };
 
-  // Get valid tasks (non-empty)
-  const validTasks = tasks.filter(task => task.text.trim() !== '');
+  // Get valid tasks (non-empty or Rest option)
+  const validTasks = tasks.filter(task => 
+    task.text.trim() !== '' || task.isRest
+  );
   const canProceed = validTasks.length >= MIN_TASKS;
+  const hasRest = tasks.some(task => task.isRest);
 
   return (
     <ScrollView style={styles.container} contentContainerStyle={styles.content}>
@@ -50,20 +62,41 @@ export default function TasksScreen() {
         <Text style={styles.subtitle}>
           Add up to {MAX_TASKS} things you're considering
         </Text>
+        <Text style={styles.philosophy}>
+          Pick Just One helps you focus on what matters most right now.
+        </Text>
       </View>
 
       <View style={styles.tasksContainer}>
         {tasks.map((task, index) => (
-          <Card key={task.id} variant="default" style={styles.taskCard}>
+          <Card 
+            key={task.id} 
+            variant="default" 
+            style={task.isRest ? { ...styles.taskCard, ...styles.restCard } : styles.taskCard}
+          >
             <View style={styles.taskRow}>
-              <Text style={styles.taskNumber}>{index + 1}.</Text>
-              <TextInput
-                style={styles.input}
-                value={task.text}
-                onChangeText={(text) => updateTask(task.id, text)}
-                placeholder={`Task ${index + 1}...`}
-                placeholderTextColor={colors.textTertiary}
-              />
+              <Text style={[
+                styles.taskNumber,
+                task.isRest && styles.restNumber
+              ]}>
+                {task.isRest ? '☕' : `${index + 1}.`}
+              </Text>
+              {task.isRest ? (
+                <View style={styles.restContainer}>
+                  <Text style={styles.restText}>{task.text}</Text>
+                  <Text style={styles.restSubtext}>
+                    Rest is not laziness. It's a conscious choice.
+                  </Text>
+                </View>
+              ) : (
+                <TextInput
+                  style={styles.input}
+                  value={task.text}
+                  onChangeText={(text) => updateTask(task.id, text)}
+                  placeholder={`Task ${index + 1}...`}
+                  placeholderTextColor={colors.textTertiary}
+                />
+              )}
               {tasks.length > MIN_TASKS && (
                 <Pressable
                   onPress={() => removeTask(task.id)}
@@ -78,12 +111,22 @@ export default function TasksScreen() {
       </View>
 
       {tasks.length < MAX_TASKS && (
-        <Button
-          title="Add Task"
-          onPress={addTask}
-          variant="outline"
-          size="medium"
-        />
+        <View style={styles.addButtonsContainer}>
+          <Button
+            title="Add Task"
+            onPress={addTask}
+            variant="outline"
+            size="medium"
+          />
+          {!hasRest && (
+            <Button
+              title="Add Rest Option"
+              onPress={addRestOption}
+              variant="secondary"
+              size="medium"
+            />
+          )}
+        </View>
       )}
 
       <View style={styles.info}>
@@ -169,5 +212,37 @@ const styles = StyleSheet.create({
   warningText: {
     ...typography.bodySmall,
     color: colors.error,
+  },
+  philosophy: {
+    ...typography.bodySmall,
+    color: colors.textSecondary,
+    textAlign: 'center',
+    fontStyle: 'italic',
+    marginTop: spacing.sm,
+  },
+  restCard: {
+    backgroundColor: '#FFF9E6',
+    borderColor: '#FFE066',
+  },
+  restContainer: {
+    flex: 1,
+  },
+  restText: {
+    ...typography.body,
+    color: '#B8860B',
+    fontWeight: '600',
+    marginBottom: spacing.xs,
+  },
+  restSubtext: {
+    ...typography.caption,
+    color: '#D4A017',
+    fontStyle: 'italic',
+  },
+  restNumber: {
+    fontSize: 20,
+  },
+  addButtonsContainer: {
+    gap: spacing.sm,
+    marginBottom: spacing.md,
   },
 });
