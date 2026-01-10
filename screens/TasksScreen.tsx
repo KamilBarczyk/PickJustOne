@@ -1,59 +1,60 @@
-import React, { useState } from 'react';
+import React, { useEffect } from 'react';
 import { View, Text, TextInput, StyleSheet, ScrollView, Pressable, KeyboardAvoidingView, Platform } from 'react-native';
 import { colors, typography, spacing, borderRadius } from '../utils/theme';
 import Button from '../components/Button';
 import Card from '../components/Card';
-
-interface Task {
-  id: string;
-  text: string;
-  isRest?: boolean; // Special task for "Rest" option
-}
+import { useAppStore, Task } from '../store/appStore';
 
 export default function TasksScreen() {
-  const [tasks, setTasks] = useState<Task[]>([
-    { id: '1', text: '' },
-    { id: '2', text: '' },
-  ]);
+  // Use global state instead of local state
+  const { tasks, setTasks, addTask, removeTask, updateTask } = useAppStore();
+  
+  // Initialize with 2 empty tasks if store is empty
+  useEffect(() => {
+    if (tasks.length === 0) {
+      setTasks([
+        { id: '1', text: '' },
+        { id: '2', text: '' },
+      ]);
+    }
+  }, []);
 
   const MAX_TASKS = 5;
   const MIN_TASKS = 2;
 
   // Add new task
-  const addTask = () => {
+  const handleAddTask = () => {
     if (tasks.length < MAX_TASKS) {
-      setTasks([...tasks, { id: Date.now().toString(), text: '' }]);
+      addTask({ id: Date.now().toString(), text: '' });
     }
   };
 
   // Add "Rest" option (special task)
   const addRestOption = () => {
-    const hasRest = tasks.some(task => task.isRest);
+    const hasRest = tasks.some((task: Task) => task.isRest);
     if (!hasRest && tasks.length < MAX_TASKS) {
-      setTasks([...tasks, { id: 'rest', text: 'Rest', isRest: true }]);
+      addTask({ id: 'rest', text: 'Rest', isRest: true });
     }
   };
 
   // Remove task
-  const removeTask = (id: string) => {
+  const handleRemoveTask = (id: string) => {
     if (tasks.length > MIN_TASKS) {
-      setTasks(tasks.filter(task => task.id !== id));
+      removeTask(id);
     }
   };
 
   // Update task text (but not for Rest option)
-  const updateTask = (id: string, text: string) => {
-    setTasks(tasks.map(task => 
-      task.id === id && !task.isRest ? { ...task, text } : task
-    ));
+  const handleUpdateTask = (id: string, text: string) => {
+    updateTask(id, text);
   };
 
   // Get valid tasks (non-empty or Rest option)
-  const validTasks = tasks.filter(task => 
+  const validTasks = tasks.filter((task: Task) => 
     task.text.trim() !== '' || task.isRest
   );
   const canProceed = validTasks.length >= MIN_TASKS;
-  const hasRest = tasks.some(task => task.isRest);
+  const hasRest = tasks.some((task: Task) => task.isRest);
 
   return (
     <KeyboardAvoidingView 
@@ -77,7 +78,7 @@ export default function TasksScreen() {
       </View>
 
       <View style={styles.tasksContainer}>
-        {tasks.map((task, index) => (
+        {tasks.map((task: Task, index: number) => (
           <Card 
             key={task.id} 
             variant="default" 
@@ -108,7 +109,7 @@ export default function TasksScreen() {
               )}
               {tasks.length > MIN_TASKS && (
                 <Pressable
-                  onPress={() => removeTask(task.id)}
+                  onPress={() => handleRemoveTask(task.id)}
                   style={styles.removeButton}
                 >
                   <Text style={styles.removeButtonText}>×</Text>
@@ -123,7 +124,7 @@ export default function TasksScreen() {
         <View style={styles.addButtonsContainer}>
           <Button
             title="Add Task"
-            onPress={addTask}
+            onPress={handleAddTask}
             variant="outline"
             size="medium"
           />
