@@ -1,13 +1,19 @@
 import React, { useEffect } from 'react';
 import { View, Text, TextInput, StyleSheet, ScrollView, Pressable, KeyboardAvoidingView, Platform } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { RootStackParamList } from '../navigation/AppNavigator';
 import { colors, typography, spacing, borderRadius } from '../utils/theme';
 import Button from '../components/Button';
 import Card from '../components/Card';
 import { useAppStore, Task } from '../store/appStore';
 
+type NavigationProp = NativeStackNavigationProp<RootStackParamList>;
+
 export default function TasksScreen() {
   // Use global state instead of local state
   const { tasks, setTasks, addTask, removeTask, updateTask } = useAppStore();
+  const navigation = useNavigation<NavigationProp>();
   
   // Initialize with 2 empty tasks if store is empty
   useEffect(() => {
@@ -29,7 +35,6 @@ export default function TasksScreen() {
     }
   };
 
-  // Add "Rest" option (special task)
   const addRestOption = () => {
     const hasRest = tasks.some((task: Task) => task.isRest);
     if (!hasRest && tasks.length < MAX_TASKS) {
@@ -49,7 +54,6 @@ export default function TasksScreen() {
     updateTask(id, text);
   };
 
-  // Get valid tasks (non-empty or Rest option)
   const validTasks = tasks.filter((task: Task) => 
     task.text.trim() !== '' || task.isRest
   );
@@ -102,7 +106,7 @@ export default function TasksScreen() {
                 <TextInput
                   style={styles.input}
                   value={task.text}
-                  onChangeText={(text) => updateTask(task.id, text)}
+                  onChangeText={(text) => handleUpdateTask(task.id, text)}
                   placeholder={`Task ${index + 1}...`}
                   placeholderTextColor={colors.textTertiary}
                 />
@@ -137,6 +141,15 @@ export default function TasksScreen() {
             />
           )}
         </View>
+      )}
+
+      {canProceed && (
+        <Button
+          title="Start Comparison"
+          onPress={() => navigation.navigate('Comparison')}
+          variant="primary"
+          size="large"
+        />
       )}
 
       <View style={styles.info}>
