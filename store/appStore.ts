@@ -7,10 +7,7 @@ export interface Task {
 }
 
 interface AppState {
-  // State
   tasks: Task[];
-  
-  // Actions
   setTasks: (tasks: Task[]) => void;
   addTask: (task: Task) => void;
   removeTask: (id: string) => void;
@@ -19,10 +16,7 @@ interface AppState {
 }
 
 export const useAppStore = create<AppState>((set) => ({
-  // Initial state
   tasks: [],
-  
-  // Actions
   setTasks: (tasks: Task[]) => set({ tasks }),
   
   addTask: (task: Task) => set((state) => ({
