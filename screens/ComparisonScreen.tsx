@@ -6,37 +6,38 @@ import { Task, useAppStore } from '../store/appStore';
 import { generateRandomizedPairs } from '../utils/pairwiseComparison';
 
 export default function ComparisonScreen() {
-  const { tasks } = useAppStore();
+  const { tasks, addComparisonChoice, clearComparisonChoices } = useAppStore();
   const [pairs, setPairs] = useState<[Task, Task][]>([]);
   const [currentPairIndex, setCurrentPairIndex] = useState(0);
-  const [selectedTasks, setSelectedTasks] = useState<Task[]>([]);
 
+  // Initialize pairs when tasks change and clear previous choices
   useEffect(() => {
     const validTasks = tasks.filter((task: Task) => task.text.trim() !== '' || task.isRest);
     if (validTasks.length >= 2) {
       const generatedPairs = generateRandomizedPairs(validTasks);
       setPairs(generatedPairs);
       setCurrentPairIndex(0);
-      setSelectedTasks([]);
+      clearComparisonChoices(); // Reset choices when starting new comparison
     }
-  }, [tasks]);
+  }, [tasks, clearComparisonChoices]);
 
   const currentPair = pairs[currentPairIndex];
   const progress = currentPairIndex + 1;
   const total = pairs.length;
 
+  // Handle user's choice: store in global state and move to next pair
   const handleTaskChoice = (selectedTask: Task) => {
     if (!currentPair) return;
 
-    // Store selected task for winner calculation
-    setSelectedTasks([...selectedTasks, selectedTask]);
+    // Store choice in global store (needed for result calculation on Results screen)
+    addComparisonChoice(selectedTask);
 
-    // Move to next pair, or finish if this was the last comparison
+    // Move to next pair if available
     if (currentPairIndex < pairs.length - 1) {
       setCurrentPairIndex(currentPairIndex + 1);
     } else {
-      // All pairs compared - ready for result calculation
-      console.log('All comparisons done!', selectedTasks);
+      // All pairs compared - navigate to results screen when it's implemented
+      // navigation.navigate('Results');
     }
   };
 
