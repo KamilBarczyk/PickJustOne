@@ -13,6 +13,10 @@ interface AppState {
   removeTask: (id: string) => void;
   updateTask: (id: string, text: string) => void;
   clearTasks: () => void;
+  // Comparison flow state
+  comparisonChoices: Task[];
+  addComparisonChoice: (task: Task) => void;
+  clearComparisonChoices: () => void;
 }
 
 export const useAppStore = create<AppState>((set) => ({
@@ -34,4 +38,11 @@ export const useAppStore = create<AppState>((set) => ({
   })),
   
   clearTasks: () => set({ tasks: [] }),
+  
+  // Comparison flow actions
+  comparisonChoices: [],
+  addComparisonChoice: (task: Task) => set((state) => ({
+    comparisonChoices: [...state.comparisonChoices, task],
+  })),
+  clearComparisonChoices: () => set({ comparisonChoices: [] }),
 }));
