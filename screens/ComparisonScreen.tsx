@@ -1,12 +1,18 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, ScrollView, Pressable } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { RootStackParamList } from '../navigation/AppNavigator';
 import { colors, typography, spacing, borderRadius } from '../utils/theme';
 import Card from '../components/Card';
 import { Task, useAppStore } from '../store/appStore';
 import { generateRandomizedPairs } from '../utils/pairwiseComparison';
 
+type NavigationProp = NativeStackNavigationProp<RootStackParamList>;
+
 export default function ComparisonScreen() {
   const { tasks, addComparisonChoice, clearComparisonChoices } = useAppStore();
+  const navigation = useNavigation<NavigationProp>();
   const [pairs, setPairs] = useState<[Task, Task][]>([]);
   const [currentPairIndex, setCurrentPairIndex] = useState(0);
 
@@ -36,8 +42,8 @@ export default function ComparisonScreen() {
     if (currentPairIndex < pairs.length - 1) {
       setCurrentPairIndex(currentPairIndex + 1);
     } else {
-      // All pairs compared - navigate to results screen when it's implemented
-      // navigation.navigate('Results');
+      // All pairs compared - navigate to results screen
+      navigation.navigate('Result');
     }
   };
 

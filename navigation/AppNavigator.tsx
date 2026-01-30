@@ -4,12 +4,14 @@ import HomeScreen from '../screens/HomeScreen';
 import AboutScreen from '../screens/AboutScreen';
 import TasksScreen from '../screens/TasksScreen';
 import ComparisonScreen from '../screens/ComparisonScreen';
+import ResultScreen from '../screens/ResultScreen';
 
 export type RootStackParamList = {
   Home: undefined;
   About: undefined;
   Tasks: undefined;
   Comparison: undefined;
+  Result: undefined;
 };
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
@@ -37,6 +39,11 @@ export default function AppNavigator() {
           name="Comparison" 
           component={ComparisonScreen}
           options={{ title: 'Comparison' }}
+        />
+        <Stack.Screen 
+          name="Result" 
+          component={ResultScreen}
+          options={{ title: 'Your Priority' }}
         />
       </Stack.Navigator>
     </NavigationContainer>
