@@ -1,9 +1,16 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, ScrollView, Pressable } from 'react-native';
+import Animated, {
+  useSharedValue,
+  useAnimatedStyle,
+  withTiming,
+  withDelay,
+} from 'react-native-reanimated';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../navigation/AppNavigator';
 import { colors, typography, spacing, borderRadius } from '../utils/theme';
+import { animationDurations, animationDelays } from '../utils/animations';
 import Card from '../components/Card';
 import { Task, useAppStore } from '../store/appStore';
 import { generateRandomizedPairs } from '../utils/pairwiseComparison';
@@ -15,6 +22,38 @@ export default function ComparisonScreen() {
   const navigation = useNavigation<NavigationProp>();
   const [pairs, setPairs] = useState<[Task, Task][]>([]);
   const [currentPairIndex, setCurrentPairIndex] = useState(0);
+
+  const cardAOpacity = useSharedValue(1);
+  const cardATranslateY = useSharedValue(0);
+  const cardBOpacity = useSharedValue(1);
+  const cardBTranslateY = useSharedValue(0);
+
+  useEffect(() => {
+    cardAOpacity.value = 0;
+    cardATranslateY.value = 20;
+    cardBOpacity.value = 0;
+    cardBTranslateY.value = 20;
+
+    cardAOpacity.value = withTiming(1, { duration: animationDurations.normal });
+    cardATranslateY.value = withTiming(0, { duration: animationDurations.normal });
+    cardBOpacity.value = withDelay(
+      animationDelays.stagger,
+      withTiming(1, { duration: animationDurations.normal })
+    );
+    cardBTranslateY.value = withDelay(
+      animationDelays.stagger,
+      withTiming(0, { duration: animationDurations.normal })
+    );
+  }, [currentPairIndex]);
+
+  const animatedCardAStyle = useAnimatedStyle(() => ({
+    opacity: cardAOpacity.value,
+    transform: [{ translateY: cardATranslateY.value }],
+  }));
+  const animatedCardBStyle = useAnimatedStyle(() => ({
+    opacity: cardBOpacity.value,
+    transform: [{ translateY: cardBTranslateY.value }],
+  }));
 
   // Initialize pairs when tasks change and clear previous choices
   useEffect(() => {
@@ -83,22 +122,24 @@ export default function ComparisonScreen() {
       </View>
 
       <View style={styles.choicesContainer}>
-        <Pressable
-          onPress={() => handleTaskChoice(taskA)}
-          style={({ pressed }) => [
-            styles.choiceCard,
-            pressed && styles.choiceCardPressed,
-          ]}
-        >
-          <Card variant="elevated" style={styles.cardContent}>
-            {taskA.isRest && (
-              <View style={styles.restIconContainer}>
-                <Text style={styles.restIcon}>☕</Text>
-              </View>
-            )}
-            <Text style={styles.choiceText}>{taskA.text}</Text>
-          </Card>
-        </Pressable>
+        <Animated.View style={[styles.choiceCard, animatedCardAStyle]}>
+          <Pressable
+            onPress={() => handleTaskChoice(taskA)}
+            style={({ pressed }) => [
+              styles.choiceCardInner,
+              pressed && styles.choiceCardPressed,
+            ]}
+          >
+            <Card variant="elevated" style={styles.cardContent}>
+              {taskA.isRest && (
+                <View style={styles.restIconContainer}>
+                  <Text style={styles.restIcon}>☕</Text>
+                </View>
+              )}
+              <Text style={styles.choiceText}>{taskA.text}</Text>
+            </Card>
+          </Pressable>
+        </Animated.View>
 
         <View style={styles.divider}>
           <View style={styles.dividerLine} />
@@ -106,22 +147,24 @@ export default function ComparisonScreen() {
           <View style={styles.dividerLine} />
         </View>
 
-        <Pressable
-          onPress={() => handleTaskChoice(taskB)}
-          style={({ pressed }) => [
-            styles.choiceCard,
-            pressed && styles.choiceCardPressed,
-          ]}
-        >
-          <Card variant="elevated" style={styles.cardContent}>
-            {taskB.isRest && (
-              <View style={styles.restIconContainer}>
-                <Text style={styles.restIcon}>☕</Text>
-              </View>
-            )}
-            <Text style={styles.choiceText}>{taskB.text}</Text>
-          </Card>
-        </Pressable>
+        <Animated.View style={[styles.choiceCard, animatedCardBStyle]}>
+          <Pressable
+            onPress={() => handleTaskChoice(taskB)}
+            style={({ pressed }) => [
+              styles.choiceCardInner,
+              pressed && styles.choiceCardPressed,
+            ]}
+          >
+            <Card variant="elevated" style={styles.cardContent}>
+              {taskB.isRest && (
+                <View style={styles.restIconContainer}>
+                  <Text style={styles.restIcon}>☕</Text>
+                </View>
+              )}
+              <Text style={styles.choiceText}>{taskB.text}</Text>
+            </Card>
+          </Pressable>
+        </Animated.View>
       </View>
 
       <Text style={styles.reminder}>
@@ -188,6 +231,9 @@ const styles = StyleSheet.create({
     marginBottom: spacing.lg,
   },
   choiceCard: {
+    borderRadius: borderRadius.lg,
+  },
+  choiceCardInner: {
     borderRadius: borderRadius.lg,
   },
   choiceCardPressed: {

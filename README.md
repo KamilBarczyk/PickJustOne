@@ -24,6 +24,7 @@ It was created to help you set priorities and teach you how to make decisions. F
   - Global state (Zustand) so data is shared between screens
   - Stack navigation (Home → Tasks → Comparison → Result)
   - Reusable UI (Button, Card) and design system (theme)
+  - Animations on comparison cards (enter) and result screen (staggered reveal)
 
 ---
 
@@ -39,6 +40,9 @@ It was created to help you set priorities and teach you how to make decisions. F
   Stack-based navigation between screens.
 - **Zustand**:  
   Global state for tasks and comparison choices.
+- **React Native Reanimated**:  
+  Animations run on the UI thread for smooth 60 FPS performance.  
+  The app uses shared values, `withTiming`, `withDelay`, and `useAnimatedStyle` to create enter transitions (comparison cards, result screen) with consistent durations defined in `utils/animations.ts`.
 - **npm**:  
   Package management and project scripts.
 
