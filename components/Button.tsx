@@ -1,6 +1,7 @@
 import React from 'react';
 import { Pressable, Text, StyleSheet, ActivityIndicator, ViewStyle, TextStyle } from 'react-native';
 import { colors, typography, spacing, borderRadius } from '../utils/theme';
+import { hapticLight } from '../utils/haptics';
 
 type ButtonVariant = 'primary' | 'secondary' | 'outline';
 type ButtonSize = 'small' | 'medium' | 'large';
@@ -41,7 +42,10 @@ export default function Button({
         ...buttonStyle,
         pressed && !disabled && !loading && styles.pressed,
       ]}
-      onPress={onPress}
+      onPress={() => {
+        hapticLight();
+        onPress();
+      }}
       disabled={disabled || loading}
     >
       {loading ? (
@@ -60,7 +64,6 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     flexDirection: 'row',
   },
-  // Variants
   primary: {
     backgroundColor: colors.primary,
   },
@@ -72,7 +75,6 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: colors.primary,
   },
-  // Sizes
   smallSize: {
     paddingHorizontal: spacing.md,
     paddingVertical: spacing.sm,
@@ -88,7 +90,6 @@ const styles = StyleSheet.create({
     paddingVertical: spacing.lg,
     minHeight: 52,
   },
-  // Text styles
   text: {
     ...typography.body,
     fontWeight: '600',

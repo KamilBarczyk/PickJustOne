@@ -12,6 +12,7 @@ import { RootStackParamList } from '../navigation/AppNavigator';
 import { colors, typography, spacing, borderRadius } from '../utils/theme';
 import { animationDurations, animationDelays } from '../utils/animations';
 import Card from '../components/Card';
+import { hapticSelection } from '../utils/haptics';
 import { Task, useAppStore } from '../store/appStore';
 import { generateRandomizedPairs } from '../utils/pairwiseComparison';
 
@@ -23,12 +24,16 @@ export default function ComparisonScreen() {
   const [pairs, setPairs] = useState<[Task, Task][]>([]);
   const [currentPairIndex, setCurrentPairIndex] = useState(0);
 
+  const progressWidth = useSharedValue(0);
   const cardAOpacity = useSharedValue(1);
   const cardATranslateY = useSharedValue(0);
   const cardBOpacity = useSharedValue(1);
   const cardBTranslateY = useSharedValue(0);
 
   useEffect(() => {
+    const target = pairs.length > 0 ? ((currentPairIndex + 1) / pairs.length) * 100 : 0;
+    progressWidth.value = withTiming(target, { duration: animationDurations.normal });
+
     cardAOpacity.value = 0;
     cardATranslateY.value = 20;
     cardBOpacity.value = 0;
@@ -54,6 +59,9 @@ export default function ComparisonScreen() {
     opacity: cardBOpacity.value,
     transform: [{ translateY: cardBTranslateY.value }],
   }));
+  const animatedProgressStyle = useAnimatedStyle(() => ({
+    width: `${progressWidth.value}%`,
+  }));
 
   // Initialize pairs when tasks change and clear previous choices
   useEffect(() => {
@@ -74,7 +82,7 @@ export default function ComparisonScreen() {
   const handleTaskChoice = (selectedTask: Task) => {
     if (!currentPair) return;
 
-    // Store choice in global store (needed for result calculation on Results screen)
+    hapticSelection();
     addComparisonChoice(selectedTask);
 
     // Move to next pair if available
@@ -105,12 +113,7 @@ export default function ComparisonScreen() {
           Comparison {progress} of {total}
         </Text>
         <View style={styles.progressBar}>
-          <View 
-            style={[
-              styles.progressFill, 
-              { width: `${(progress / total) * 100}%` }
-            ]} 
-          />
+          <Animated.View style={[styles.progressFill, animatedProgressStyle]} />
         </View>
       </View>
 

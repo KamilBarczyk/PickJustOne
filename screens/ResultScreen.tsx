@@ -13,6 +13,7 @@ import { colors, typography, spacing, borderRadius } from '../utils/theme';
 import { animationDurations, animationDelays } from '../utils/animations';
 import Button from '../components/Button';
 import Card from '../components/Card';
+import { hapticSuccess } from '../utils/haptics';
 import { useAppStore } from '../store/appStore';
 import { calculateWinner } from '../utils/calculateWinner';
 
@@ -32,6 +33,8 @@ export default function ResultScreen() {
   const buttonsTranslateY = useSharedValue(16);
 
   useEffect(() => {
+    hapticSuccess();
+
     winnerOpacity.value = withTiming(1, { duration: animationDurations.slow });
     winnerScale.value = withTiming(1, { duration: animationDurations.slow });
 
