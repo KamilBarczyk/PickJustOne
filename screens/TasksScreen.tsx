@@ -6,6 +6,7 @@ import { RootStackParamList } from '../navigation/AppNavigator';
 import { colors, typography, spacing, borderRadius } from '../utils/theme';
 import Button from '../components/Button';
 import Card from '../components/Card';
+import { hapticLight, hapticMedium, hapticWarning } from '../utils/haptics';
 import { useAppStore, Task } from '../store/appStore';
 
 type NavigationProp = NativeStackNavigationProp<RootStackParamList>;
@@ -31,20 +32,24 @@ export default function TasksScreen() {
   // Add new task
   const handleAddTask = () => {
     if (tasks.length < MAX_TASKS) {
+      hapticLight();
       addTask({ id: Date.now().toString(), text: '' });
+    } else {
+      hapticWarning();
     }
   };
 
   const addRestOption = () => {
     const hasRest = tasks.some((task: Task) => task.isRest);
     if (!hasRest && tasks.length < MAX_TASKS) {
+      hapticLight();
       addTask({ id: 'rest', text: 'Rest', isRest: true });
     }
   };
 
-  // Remove task
   const handleRemoveTask = (id: string) => {
     if (tasks.length > MIN_TASKS) {
+      hapticMedium();
       removeTask(id);
     }
   };
